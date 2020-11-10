@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from "@react-native-community/async-storage";
+
+import { UserContext } from '../../contexts/UserContext';
 
 import BarberLogo from '../../assets/barber.svg'
 import PersonIcon from '../../assets/person.svg'
@@ -9,7 +12,10 @@ import LockIcon from '../../assets/lock.svg'
 import { Container, InputArea, CustomButton, CustomButtonText, SignMessageButton, SignMessageButtonText, SignMessageButtonTextBold } from './styles';
 import SignInput from '../../components/SignInput';
 
+import Api from '../../Api';
+
 export default () => {
+  const { dispatch: userDispatch } = useContext(UserContext);
   const navigation = useNavigation();
 
   const [nameField, setNameField] = useState('');
@@ -20,8 +26,27 @@ export default () => {
     navigation.reset({ routes: [{ name: 'SignIn' }] })
   }
 
-  const handleSignClick = () => {
+  const handleSignClick = async () => {
+    if(nameField !== '' && emailField !== '' && passwordField !== ''){
+      let json = await Api.signUp(nameField, emailField, passwordField);
 
+      if(json.token){
+        await AsyncStorage.setItem('token', json.token);
+
+        userDispatch({
+          type: 'setAvatar',
+          payload: { avatar: json.data.avatar }
+        });
+
+        navigation.reset({ routes: [{ name: 'MainTab' }] })
+      }
+      else {
+        alert('Email ou senha errados');
+      }
+    }
+    else {
+      alert('Preencha os campos');
+    }
   }
 
   return (
@@ -39,6 +64,7 @@ export default () => {
           IconSvg={EmailIcon}
           placeholder='Digite seu email'
           value={ emailField }
+          keyboardType='email-address'
           onChangeText={ text => setEmailField(text) }
         />
         <SignInput

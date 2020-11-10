@@ -2,7 +2,7 @@ import React from 'react';
 
 import { InputArea, Input } from './styles';
 
-export default ({ IconSvg, placeholder, value, onChangeText, password }) => {
+export default ({ IconSvg, placeholder, value, onChangeText, password, keyboardType }) => {
   return (
     <InputArea>
       <IconSvg width='24' height='24' fill='#268596' />
@@ -12,6 +12,7 @@ export default ({ IconSvg, placeholder, value, onChangeText, password }) => {
         value={ value }
         onChangeText={ onChangeText }
         secureTextEntry={ password }
+        keyboardType={ keyboardType }
       />
     </InputArea>
   );
